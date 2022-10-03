@@ -1,4 +1,4 @@
-package com.adelchik.Core.controller;
+package com.adelchik.Core.frontendConnectivity;
 
 import com.adelchik.Core.mqComponents.RMQProducer;
 import com.adelchik.Core.db.entities.TextEntity;

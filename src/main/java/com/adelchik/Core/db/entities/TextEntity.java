@@ -13,7 +13,8 @@ public class TextEntity {
     public TextEntity() {
     }
 
-    public TextEntity(String text) {
+    public TextEntity(int id, String text) {
+        this.id = id;
         this.text = text;
     }
 
