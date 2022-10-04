@@ -47,7 +47,7 @@ public class APIController {
 
 
     // for RabbitMQ
-    // example: http://localhost:8080/api/v1/publish?message=hello
+    // example: http://localhost:8080/publish?message=hello
     @GetMapping("/publish")
     public ResponseEntity<String> sendMessage(@RequestParam("message") String message){
         producer.sendMessage(message);
