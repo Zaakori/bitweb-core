@@ -9,7 +9,7 @@ import javax.persistence.Table;
 public class TextEntity {
 
     @Id
-    private int id;
+    private Long id;
     private String status;
     private String originaltext;
     private String processedtext;
@@ -17,12 +17,12 @@ public class TextEntity {
     public TextEntity() {
     }
 
-    public TextEntity(int id, String originaltext) {
+    public TextEntity(Long id, String originaltext) {
         this.id = id;
         this.originaltext = originaltext;
     }
 
-    public TextEntity(int id, String status, String originaltext, String processedtext) {
+    public TextEntity(Long id, String status, String originaltext, String processedtext) {
         this.id = id;
         this.status = status;
         this.originaltext = originaltext;
@@ -31,11 +31,11 @@ public class TextEntity {
 
 
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
