@@ -12,11 +12,10 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Service
-public class RoutingAndProcessingService {
+public class FileInsertingService {
 
     @Autowired
     private TextRepository repo;
@@ -27,11 +26,11 @@ public class RoutingAndProcessingService {
 
     private int totalChunkAmount;
 
-    public RoutingAndProcessingService(RMQProducer producer) {
+    public FileInsertingService(RMQProducer producer) {
         this.producer = producer;
     }
 
-    public void processIncomingFile(MultipartFile file) {
+    public String processIncomingFile(MultipartFile file) {
 
         ArrayList<String> list = new ArrayList<>();
 
@@ -48,39 +47,7 @@ public class RoutingAndProcessingService {
 
         sendChunksToRMQWithHeaders(id, onePartFile, list);
 
-    }
-
-    public void extractTheProcessedFile(String id){
-
-        HashMap<String, Integer> map = convertStringToMap(repo.findByStringId(id).getProcessedtext());
-
-
-    }
-
-    private HashMap<String, Integer> convertStringToMap(String processedText){
-
-        String[] wordAndFreqRaw = processedText.substring(2).split("}\\{");
-        HashMap<String, Integer> map = new HashMap<>();
-
-        for(String rawPair : wordAndFreqRaw){
-
-            String[] separatedWordAndFreq = rawPair.split(" : ");
-            map.put(separatedWordAndFreq[0], Integer.parseInt(separatedWordAndFreq[1]));
-
-        }
-
-        return map;
-    }
-
-
-
-    private void sendChunksToRMQWithHeaders(String id, String onePartFile, ArrayList<String> list){
-
-        // here I add the id and the info whether it is a one-part file or file in multiple parts
-        for(String chunk : list){
-            sendMessageToRMQ(id + " " + onePartFile + " " + chunk);
-        }
-
+        return id;
     }
 
     private ArrayList<String> splitTextIntoChunks(String originalText){
@@ -138,8 +105,13 @@ public class RoutingAndProcessingService {
     private String generateID(){
         return UUID.randomUUID().toString();
     }
+    private void sendChunksToRMQWithHeaders(String id, String onePartFile, ArrayList<String> list){
 
-    private void sendMessageToRMQ(String message){
-        producer.sendMessage(message);
+        // here I add the id and the info whether it is a one-part file or file in multiple parts
+        for(String chunk : list){
+            producer.sendMessage(id + " " + onePartFile + " " + chunk);
+        }
+
     }
+
 }
