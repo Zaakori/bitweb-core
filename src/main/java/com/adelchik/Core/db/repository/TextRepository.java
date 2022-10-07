@@ -14,5 +14,9 @@ public interface TextRepository extends JpaRepository<TextEntity, Long> {
     @Transactional
     @Modifying
     @Query(value = "UPDATE text SET status = ?1 WHERE id = ?2", nativeQuery = true)
-    void updateStatus(String status, Long entityId);
+    void updateStatus(String status, String entityId);
+
+    @Transactional
+    @Query(value = "SELECT * FROM text WHERE id = ?1", nativeQuery = true)
+    TextEntity findByStringId(String id);
 }

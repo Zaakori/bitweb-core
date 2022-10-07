@@ -1,5 +1,6 @@
 package com.adelchik.Core.services;
 
+import com.adelchik.Core.db.entities.TextEntity;
 import com.adelchik.Core.db.repository.TextRepository;
 import com.adelchik.Core.mqComponents.RMQProducer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class RoutingAndProcessingService {
 
     private RMQProducer producer;
 
+    private String onePartFile;
+
     public RoutingAndProcessingService(RMQProducer producer) {
         this.producer = producer;
     }
@@ -29,21 +32,31 @@ public class RoutingAndProcessingService {
 
         ArrayList<String> list = new ArrayList<>();
 
+        String id = generateID();
+
         try {
             list = splitTextIntoChunks(new String(file.getBytes()));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String ID = generateID();
+        TextEntity entity = new TextEntity(id, "IN TRANSIT");
+        repo.save(entity);
 
+        sendChunksToRMQWithHeaders(id, onePartFile, list);
+
+    }
+
+    private void sendChunksToRMQWithHeaders(String id, String onePartFile, ArrayList<String> list){
+
+        // here I add the id and the info whether it is a one-part file or file in multiple parts
         for(String chunk : list){
-            sendMessageToRMQ(chunk);
+            sendMessageToRMQ(id + " " + onePartFile + " " + chunk);
         }
 
     }
 
-    private static ArrayList<String> splitTextIntoChunks(String originalText){
+    private ArrayList<String> splitTextIntoChunks(String originalText){
 
         int maxLengthInKiloBytes = 500;
         int maxLength = maxLengthInKiloBytes * 1000;
@@ -82,6 +95,12 @@ public class RoutingAndProcessingService {
             list.add(chunk);
 
             currentCharIndex = currentCharIndex + maxLength + offset;
+        }
+
+        if(list.size() == 1){
+            onePartFile = "yes";
+        } else {
+            onePartFile = "non";
         }
 
         return list;

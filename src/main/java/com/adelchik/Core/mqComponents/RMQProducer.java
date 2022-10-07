@@ -24,7 +24,7 @@ public class RMQProducer {
     }
 
     public void sendMessage(String message){
-        LOGGER.info(String.format("Message sent -> %s", message));
+        LOGGER.info(String.format("Message sent with id -> %s", message.substring(0, 36)));
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
     }
 }
