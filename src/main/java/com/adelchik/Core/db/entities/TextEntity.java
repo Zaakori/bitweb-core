@@ -11,14 +11,18 @@ public class TextEntity {
     @Id
     private String id;
     private String status;
+    private int total_chunk_amount;
+    private int processed_chunk_amount;
     private String processedtext;
 
     public TextEntity() {
     }
 
-    public TextEntity(String id, String status) {
+    public TextEntity(String id, String status, int total_chunk_amount) {
         this.id = id;
         this.status = status;
+        this.total_chunk_amount = total_chunk_amount;
+        this.processed_chunk_amount = 0;
     }
 
     public String getId() {
@@ -35,6 +39,22 @@ public class TextEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getTotal_chunk_amount() {
+        return total_chunk_amount;
+    }
+
+    public void setTotal_chunk_amount(int total_chunk_amount) {
+        this.total_chunk_amount = total_chunk_amount;
+    }
+
+    public int getProcessed_chunk_amount() {
+        return processed_chunk_amount;
+    }
+
+    public void setProcessed_chunk_amount(int processed_chunk_amount) {
+        this.processed_chunk_amount = processed_chunk_amount;
     }
 
     public String getProcessedtext() {

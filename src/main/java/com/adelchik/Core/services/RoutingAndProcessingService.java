@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -23,6 +24,8 @@ public class RoutingAndProcessingService {
     private RMQProducer producer;
 
     private String onePartFile;
+
+    private int totalChunkAmount;
 
     public RoutingAndProcessingService(RMQProducer producer) {
         this.producer = producer;
@@ -40,12 +43,36 @@ public class RoutingAndProcessingService {
             e.printStackTrace();
         }
 
-        TextEntity entity = new TextEntity(id, "IN TRANSIT");
+        TextEntity entity = new TextEntity(id, "IN TRANSIT", totalChunkAmount);
         repo.save(entity);
 
         sendChunksToRMQWithHeaders(id, onePartFile, list);
 
     }
+
+    public void extractTheProcessedFile(String id){
+
+        HashMap<String, Integer> map = convertStringToMap(repo.findByStringId(id).getProcessedtext());
+
+
+    }
+
+    private HashMap<String, Integer> convertStringToMap(String processedText){
+
+        String[] wordAndFreqRaw = processedText.substring(2).split("}\\{");
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for(String rawPair : wordAndFreqRaw){
+
+            String[] separatedWordAndFreq = rawPair.split(" : ");
+            map.put(separatedWordAndFreq[0], Integer.parseInt(separatedWordAndFreq[1]));
+
+        }
+
+        return map;
+    }
+
+
 
     private void sendChunksToRMQWithHeaders(String id, String onePartFile, ArrayList<String> list){
 
@@ -96,6 +123,8 @@ public class RoutingAndProcessingService {
 
             currentCharIndex = currentCharIndex + maxLength + offset;
         }
+
+        totalChunkAmount = list.size();
 
         if(list.size() == 1){
             onePartFile = "yes";
