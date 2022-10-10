@@ -1,5 +1,6 @@
 package com.adelchik.Core.services;
 
+import com.adelchik.Core.MyObject;
 import com.adelchik.Core.db.entities.TextEntity;
 import com.adelchik.Core.db.repository.TextRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,12 @@ public class FileExtractingService {
     @Autowired
     private TextRepository repo;
 
-    public HashMap<String, Integer> returnProcessedFile(String id){
+    public MyObject[] returnProcessedFile(String id){
 
         TextEntity entity = repo.findByStringId(id);
 
         if(entity.getStatus().equals("READY")){
-
-            HashMap<String, Integer> map = convertStringToMap(entity.getProcessedtext());
-
-            return orderWordsByFrequency(map);
+            return convertStringToArray(entity.getProcessedtext());
         }
 
         return null;
@@ -29,6 +27,25 @@ public class FileExtractingService {
 
     public String getStatus(String id){
         return repo.findByStringId(id).getStatus();
+    }
+
+    private MyObject[] convertStringToArray(String processedText){
+
+        String[] wordAndFreqRaw = processedText.substring(2).split("}\\{");
+        MyObject[] myObjectArray = new MyObject[wordAndFreqRaw.length];
+        int counter = 0;
+
+        for(String rawPair : wordAndFreqRaw){
+
+            String[] separatedWordAndFreq = rawPair.split(" : ");
+            MyObject myObject = new MyObject(separatedWordAndFreq[0], Integer.parseInt(separatedWordAndFreq[1]));
+
+            myObjectArray[counter] = myObject;
+
+            counter++;
+        }
+
+        return myObjectArray;
     }
 
     private HashMap<String, Integer> convertStringToMap(String processedText){
