@@ -28,10 +28,19 @@ public class APIController {
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/extract")
-    public ResponseEntity<MyObject[]> extractProcessedText(@RequestParam("message") String message){
+    @GetMapping(value = "/extractTable")
+    public ResponseEntity<MyObject[]> extractProcessedTextForTable(@RequestParam("message") String message){
 
-        return new ResponseEntity<>(extractingService.returnProcessedFile(message), HttpStatus.OK);
+        return new ResponseEntity<>(extractingService.returnProcessedFileForTable(message), HttpStatus.OK);
 
     }
+
+    @GetMapping(value = "/extractWordCloud")
+    public ResponseEntity<MyObject[]> extractProcessedTextForWordCloud(@RequestParam("message") String message){
+
+        return new ResponseEntity<>(extractingService.returnProcessedFileForWordCloud(message), HttpStatus.OK);
+
+    }
+
+
 }

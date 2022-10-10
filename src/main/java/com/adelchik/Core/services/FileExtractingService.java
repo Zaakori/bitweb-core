@@ -14,12 +14,23 @@ public class FileExtractingService {
     @Autowired
     private TextRepository repo;
 
-    public MyObject[] returnProcessedFile(String id){
+    public MyObject[] returnProcessedFileForTable(String id){
 
         TextEntity entity = repo.findByStringId(id);
 
         if(entity.getStatus().equals("READY")){
-            return convertStringToArray(entity.getProcessedtext());
+            return convertStringToArray(entity.getProcessedtext(), Integer.MAX_VALUE);
+        }
+
+        return null;
+    }
+
+    public MyObject[] returnProcessedFileForWordCloud(String id){
+
+        TextEntity entity = repo.findByStringId(id);
+
+        if(entity.getStatus().equals("READY")){
+            return convertStringToArray(entity.getProcessedtext(), 100);
         }
 
         return null;
@@ -29,11 +40,17 @@ public class FileExtractingService {
         return repo.findByStringId(id).getStatus();
     }
 
-    private MyObject[] convertStringToArray(String processedText){
+    private MyObject[] convertStringToArray(String processedText, int maxAmountOfWords){
 
         String[] wordAndFreqRaw = processedText.substring(2).split("}\\{");
-        MyObject[] myObjectArray = new MyObject[wordAndFreqRaw.length];
+        MyObject[] myObjectArray;
         int counter = 0;
+
+        if((maxAmountOfWords == Integer.MAX_VALUE) || (wordAndFreqRaw.length <= maxAmountOfWords)){
+            myObjectArray = new MyObject[wordAndFreqRaw.length];
+        } else {
+            myObjectArray = new MyObject[maxAmountOfWords];
+        }
 
         for(String rawPair : wordAndFreqRaw){
 
@@ -43,46 +60,13 @@ public class FileExtractingService {
             myObjectArray[counter] = myObject;
 
             counter++;
+
+            if(counter >= maxAmountOfWords){
+                break;
+            }
         }
 
         return myObjectArray;
     }
-
-    private HashMap<String, Integer> convertStringToMap(String processedText){
-
-        String[] wordAndFreqRaw = processedText.substring(2).split("}\\{");
-        HashMap<String, Integer> map = new HashMap<>();
-
-        for(String rawPair : wordAndFreqRaw){
-
-            String[] separatedWordAndFreq = rawPair.split(" : ");
-            map.put(separatedWordAndFreq[0], Integer.parseInt(separatedWordAndFreq[1]));
-
-        }
-
-        return map;
-    }
-
-    private HashMap<String, Integer> orderWordsByFrequency(HashMap<String, Integer> originalMap){
-
-        List<Map.Entry<String, Integer>> list = new LinkedList<>(originalMap.entrySet());
-
-        list.sort(new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return (o2.getValue()).compareTo(o1.getValue());
-            }
-        });
-
-        HashMap<String, Integer> sortedMap = new LinkedHashMap<>();
-
-        for(Map.Entry<String, Integer> entry : list){
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
-    }
-
-
 
 }
