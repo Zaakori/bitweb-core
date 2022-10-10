@@ -2,19 +2,19 @@ package com.adelchik.Core;
 
 public class MyObject {
 
-    private String word;
-    private int count;
+    private String text;
+    private int value;
 
-    public MyObject(String word, int count) {
-        this.word = word;
-        this.count = count;
+    public MyObject(String text, int value) {
+        this.text = text;
+        this.value = value;
     }
 
-    public String getWord() {
-        return word;
+    public String getText() {
+        return text;
     }
 
-    public int getCount() {
-        return count;
+    public int getValue() {
+        return value;
     }
 }
