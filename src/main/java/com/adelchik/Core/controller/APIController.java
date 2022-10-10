@@ -28,12 +28,10 @@ public class APIController {
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
-//    @GetMapping(value = "/extract")
-//    public ResponseEntity<MyObject> extractProcessedText(@RequestParam("message") String message){
-//
-//        MyObject response = new MyObject(extractingService.getStatus(message), extractingService.returnProcessedFile(message));
-//
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//
-//    }
+    @GetMapping(value = "/extract")
+    public ResponseEntity<MyObject[]> extractProcessedText(@RequestParam("message") String message){
+
+        return new ResponseEntity<>(extractingService.returnProcessedFile(message), HttpStatus.OK);
+
+    }
 }
