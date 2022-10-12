@@ -30,3 +30,10 @@ services:
         depends_on:
           - "db"
           - "rabbitmq"
+
+      frontend:
+        image: frontend-app
+        ports:
+          - "3000:3000"
+        depends_on:
+          - "core"
