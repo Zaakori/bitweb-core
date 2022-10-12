@@ -7,6 +7,7 @@ services:
         ports:
           - "5672:5672"
           - "15672:15672"
+
       db:
         image: postgres:14.1-alpine
         restart: always
@@ -15,3 +16,17 @@ services:
           - POSTGRES_PASSWORD=postgres
         ports:
           - '5432:5432'
+
+      core:
+        image: core-app
+        ports:
+          - "8080:8080"
+        depends_on:
+          - "db"
+          - "rabbitmq"
+
+      worker:
+        image: worker-app
+        depends_on:
+          - "db"
+          - "rabbitmq"
